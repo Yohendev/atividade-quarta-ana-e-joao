@@ -1,3 +1,29 @@
+class CalculadoraPreco:
+    @staticmethod
+    def calcular_desconto(tipo_cliente, subtotal):
+        if tipo_cliente == "COMUM" and subtotal > 500: return subtotal * 0.05
+        if tipo_cliente == "VIP": return subtotal * 0.15 if subtotal > 500 else subtotal * 0.10
+        if tipo_cliente == "FUNCIONARIO": return subtotal * 0.20
+        return 0
+
+    @staticmethod
+    def calcular_frete(uf, total_com_desconto, tipo_cliente):
+        if total_com_desconto > 300 or tipo_cliente == "VIP": return 0
+        if uf == "PE": return 12.5
+        if uf in ["PB", "AL", "RN", "BA", "SE", "CE", "PI", "MA"]: return 22.9
+        return 39.9
+
+    @staticmethod
+    def aplicar_taxas_pagamento(total, pagamento, parcelas):
+        if pagamento == "PIX": return total * 0.95
+        if pagamento == "BOLETO": return total + 2.5
+        if pagamento == "CARTAO":
+            if parcelas < 1 or parcelas > 12: raise ValueError("ERRO: parcelas invalidas")
+            if parcelas > 3: return total * (1 + 0.0199 * parcelas)
+        elif pagamento not in ["PIX", "BOLETO", "CARTAO"]:
+            raise ValueError("ERRO: forma de pagamento invalida")
+        return total
+
 class ItemPedido:
     def __init__(self, produto, quantidade, preco):
         self.produto = produto
@@ -95,4 +121,5 @@ class GerenciadorPedidos:
         self.total_vendido += total
         self.itens.clear()
         return "OK: " + "%.2f" % total
+
 
