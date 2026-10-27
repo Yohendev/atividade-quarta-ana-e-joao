@@ -1,3 +1,29 @@
+class ItemPedido:
+    def __init__(self, produto, quantidade, preco):
+        self.produto = produto
+        self.quantidade = int(quantidade)
+        self.preco = float(preco)
+    def calcular_subtotal(self):
+        return self.quantidade * self.preco
+
+class Cliente:
+    def __init__(self, nome, email, tipo):
+        self.nome = nome; self.email = email; self.tipo = tipo
+    def is_valido(self):
+        if self.nome is None or self.nome.strip() == "": return "ERRO: cliente sem nome"
+        if self.email is None or "@" not in self.email or "." not in self.email: return "ERRO: email invalido"
+        if self.tipo not in ["COMUM", "VIP", "FUNCIONARIO"]: return "ERRO: tipo de cliente desconhecido"
+        return None
+
+class Endereco:
+    def __init__(self, rua, numero, cidade, uf, cep):
+        self.rua = rua; self.numero = numero; self.cidade = cidade; self.uf = uf; self.cep = cep
+    def is_valido(self):
+        if self.cep is None or len(self.cep.replace("-", "")) != 8: return "ERRO: cep invalido"
+        return None
+    def formatar(self):
+        return f"{self.rua}, {self.numero}, {self.cidade}/{self.uf}, CEP {self.cep}"
+
 class GerenciadorPedidos:
     def __init__(self):
         self.itens = []
@@ -69,3 +95,4 @@ class GerenciadorPedidos:
         self.total_vendido += total
         self.itens.clear()
         return "OK: " + "%.2f" % total
+
