@@ -1,3 +1,19 @@
+class RepositorioPedidosCSV:
+    @staticmethod
+    def salvar(linha):
+        try:
+            with open("pedidos.csv", "a", encoding="utf-8") as f: f.write(linha + "\n")
+        except OSError as e: print("Falha ao salvar pedido: " + str(e))
+
+class ServicoNotificacao:
+    @staticmethod
+    def confirmar_pedido(cliente, total, endereco):
+        mensagem = f"Ola {cliente.nome}, seu pedido foi confirmado. "
+        if cliente.tipo == "VIP": mensagem += "Obrigado por ser VIP! Frete gratis garantido. "
+        elif cliente.tipo == "FUNCIONARIO": mensagem += "Desconto de colaborador aplicado. "
+        mensagem += f"Total: R$ {total:.2f}. Entrega em: {endereco}"
+        print(f"[EMAIL para {cliente.email}] {mensagem}")
+
 class CalculadoraPreco:
     @staticmethod
     def calcular_desconto(tipo_cliente, subtotal):
@@ -121,5 +137,6 @@ class GerenciadorPedidos:
         self.total_vendido += total
         self.itens.clear()
         return "OK: " + "%.2f" % total
+
 
 
