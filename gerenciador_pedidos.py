@@ -1,46 +1,48 @@
+from typing import Optional, List, Dict
+
 class ItemPedido:
-    def __init__(self, produto, quantidade, preco):
+    def __init__(self, produto: str, quantidade: int, preco: float):
         self.produto = produto
         self.quantidade = int(quantidade)
         self.preco = float(preco)
-    def calcular_subtotal(self):
+    def calcular_subtotal(self) -> float:
         return self.quantidade * self.preco
 
 class Cliente:
-    def __init__(self, nome, email, tipo):
+    def __init__(self, nome: str, email: str, tipo: str):
         self.nome = nome; self.email = email; self.tipo = tipo
-    def is_valido(self):
-        if self.nome is None or self.nome.strip() == "": return "ERRO: cliente sem nome"
-        if self.email is None or "@" not in self.email or "." not in self.email: return "ERRO: email invalido"
+    def is_valido(self) -> Optional[str]:
+        if not self.nome or not self.nome.strip(): return "ERRO: cliente sem nome"
+        if not self.email or "@" not in self.email or "." not in self.email: return "ERRO: email invalido"
         if self.tipo not in ["COMUM", "VIP", "FUNCIONARIO"]: return "ERRO: tipo de cliente desconhecido"
         return None
 
 class Endereco:
-    def __init__(self, rua, numero, cidade, uf, cep):
+    def __init__(self, rua: str, numero: str, cidade: str, uf: str, cep: str):
         self.rua = rua; self.numero = numero; self.cidade = cidade; self.uf = uf; self.cep = cep
-    def is_valido(self):
-        if self.cep is None or len(self.cep.replace("-", "")) != 8: return "ERRO: cep invalido"
+    def is_valido(self) -> Optional[str]:
+        if not self.cep or len(self.cep.replace("-", "")) != 8: return "ERRO: cep invalido"
         return None
-    def formatar(self):
+    def formatar(self) -> str:
         return f"{self.rua}, {self.numero}, {self.cidade}/{self.uf}, CEP {self.cep}"
 
 class CalculadoraPreco:
     @staticmethod
-    def calcular_desconto(tipo_cliente, subtotal):
+    def calcular_desconto(tipo_cliente: str, subtotal: float) -> float:
         if tipo_cliente == "COMUM" and subtotal > 500: return subtotal * 0.05
         if tipo_cliente == "VIP": return subtotal * 0.15 if subtotal > 500 else subtotal * 0.10
         if tipo_cliente == "FUNCIONARIO": return subtotal * 0.20
-        return 0
+        return 0.0
 
     @staticmethod
-    def calcular_frete(uf, total_com_desconto, tipo_cliente):
-        if total_com_desconto > 300 or tipo_cliente == "VIP": return 0
+    def calcular_frete(uf: str, total_com_desconto: float, tipo_cliente: str) -> float:
+        if total_com_desconto > 300 or tipo_cliente == "VIP": return 0.0
         if uf == "PE": return 12.5
         if uf in ["PB", "AL", "RN", "BA", "SE", "CE", "PI", "MA"]: return 22.9
         return 39.9
 
     @staticmethod
-    def aplicar_taxas_pagamento(total, pagamento, parcelas):
+    def aplicar_taxas_pagamento(total: float, pagamento: str, parcelas: int) -> float:
         if pagamento == "PIX": return total * 0.95
         if pagamento == "BOLETO": return total + 2.5
         if pagamento == "CARTAO":
@@ -51,14 +53,14 @@ class CalculadoraPreco:
 
 class RepositorioPedidosCSV:
     @staticmethod
-    def salvar(linha):
+    def salvar(linha: str):
         try:
             with open("pedidos.csv", "a", encoding="utf-8") as f: f.write(linha + "\n")
         except OSError as e: print("Falha ao salvar pedido: " + str(e))
 
 class ServicoNotificacao:
     @staticmethod
-    def confirmar_pedido(cliente, total, endereco):
+    def confirmar_pedido(cliente: Cliente, total: float, endereco: str):
         mensagem = f"Ola {cliente.nome}, seu pedido foi confirmado. "
         if cliente.tipo == "VIP": mensagem += "Obrigado por ser VIP! Frete gratis garantido. "
         elif cliente.tipo == "FUNCIONARIO": mensagem += "Desconto de colaborador aplicado. "
@@ -67,12 +69,12 @@ class ServicoNotificacao:
 
 class GerenciadorPedidos:
     def __init__(self):
-        self.itens = []
-        self.estoque = {"CANETA": 100, "CADERNO": 50, "MOCHILA": 10, "CALCULADORA": 5}
-        self.historico = []
-        self.total_vendido = 0
+        self.itens: List[ItemPedido] = []
+        self.estoque: Dict[str, int] = {"CANETA": 100, "CADERNO": 50, "MOCHILA": 10, "CALCULADORA": 5}
+        self.historico: List[str] = []
+        self.total_vendido: float = 0
 
-    def adicionar_item(self, produto, qtd, preco):
+    def adicionar_item(self, produto: str, qtd: int, preco: float):
         self.itens.append(ItemPedido(produto, qtd, preco))
 
     def processar_pedido(self, nome, email, tipo_cliente, pagamento, parcelas, rua, numero, cidade, uf, cep):
